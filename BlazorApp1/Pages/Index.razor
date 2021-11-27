@@ -1,0 +1,17 @@
+﻿@page "/"
+<MudAvatar Image="@photo" /><br>
+<InputFile id="fileInput" OnChange="UploadFile" hidden accept=".jpg, .jpeg, .png" />
+<MudButton DisableElevation="true" HtmlTag="label" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Filled.Image" for="fileInput">Upload</MudButton>
+@code{
+string photo {get;set;}
+private IBrowserFile file;
+    private async void UploadFile(InputFileChangeEventArgs e)
+    {
+        file = e.File;
+        var buffers = new byte[file.Size];
+        await file.OpenReadStream().ReadAsync(buffers);
+        photo = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffers)}";
+
+        StateHasChanged();
+    }
+}
