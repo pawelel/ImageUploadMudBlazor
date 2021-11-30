@@ -30,5 +30,13 @@
 
     <script src="_framework/blazor.server.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script>
+        async function setImageUsingStreaming(imageElementId, imageStream) {
+  const arrayBuffer = await imageStream.arrayBuffer();
+  const blob = new Blob([arrayBuffer]);
+  const url = URL.createObjectURL(blob);
+  document.getElementById(imageElementId).src = url;
+}
+    </script>
 </body>
 </html>

@@ -1,17 +1,46 @@
 ﻿@page "/"
-<MudAvatar Image="@photo" /><br>
-<InputFile id="fileInput" OnChange="UploadFile" hidden accept=".jpg, .jpeg, .png" />
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+<img id="showImageHere" /><br>
+<InputFile id="fileInput" OnChange="ResizeAndDisplayImageUsingStreaming" hidden accept=".jpg, .jpeg, .png, .gif" />
 <MudButton DisableElevation="true" HtmlTag="label" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Filled.Image" for="fileInput">Upload</MudButton>
-@code{
-string photo {get;set;}
-private IBrowserFile file;
-    private async void UploadFile(InputFileChangeEventArgs e)
-    {
-        file = e.File;
-        var buffers = new byte[file.Size];
-        await file.OpenReadStream().ReadAsync(buffers);
-        photo = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffers)}";
 
-        StateHasChanged();
+<img id="image1" />
+
+<MudButton OnClick="SetImageUsingStreamingAsync">
+    Set Image Using Image Stream
+</MudButton>
+@code{
+//string photo {get;set;}
+//private IBrowserFile file;
+//    private async void UploadFile(InputFileChangeEventArgs e)
+//    {
+//        file = e.File;
+//        var buffers = new byte[file.Size];
+//        await file.OpenReadStream().ReadAsync(buffers);
+//        photo = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffers)}";
+
+//        StateHasChanged();
+//    }
+    private async Task SetImageUsingStreamingAsync()
+    {
+        var imageStream = await GetImageStreamAsync();
+        var dotnetImageStream = new DotNetStreamReference(imageStream);
+        await JSRuntime.InvokeVoidAsync("setImageUsingStreaming", 
+            "image1", dotnetImageStream);
+    }
+     private async Task<Stream> GetImageStreamAsync()
+    {
+        return await HttpClient.GetStreamAsync(
+            "https://avatars.githubusercontent.com/u/9141961");
+    }
+    private async Task ResizeAndDisplayImageUsingStreaming(InputFileChangeEventArgs e)
+    {
+        var imageFile = e.File;
+        var resizedImage = await imageFile.RequestImageFileAsync("image/gif", 250, 250);
+        var jsImageStream = resizedImage.OpenReadStream();
+        var dotnetImageStream = new DotNetStreamReference(jsImageStream);
+        await JSRuntime.InvokeVoidAsync("setImageUsingStreaming", 
+            "showImageHere", dotnetImageStream);
     }
 }
