@@ -1,0 +1,63 @@
+﻿@page "/MudFormExample"
+
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+
+
+<div style="max-width: 400px;">
+    <MudCard>
+        <MudCardContent>
+            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                <MudTextField T="string" Label="IPv4" HelperText="Type IPv4" @ref="ipField1"
+                              Validation="@(new Func<string, IEnumerable<string>>(ValidateIp))" />
+                <MudTextField T="string" Label="MAC" HelperText="Type MAC" @ref="macField1"
+                              Validation="@(new Func<string, IEnumerable<string>>(ValidateMac))"  />              
+            </MudForm>
+        </MudCardContent>
+    </MudCard>
+
+    <MudPaper Class="pa-4 justify-center my-4 mud-text-align-center">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(()=>form.Validate())">Validate</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(()=>form.Reset())" Class="mx-2">Reset</MudButton>
+        <MudButton Variant="Variant.Filled" OnClick="@(()=>form.ResetValidation())">Reset Validation</MudButton>
+    </MudPaper>
+
+    <MudExpansionPanels>
+        <MudExpansionPanel Text="@($"Show Errors ({errors.Length})")">
+            @foreach (var error in errors)
+            {
+                <MudText Color="@Color.Error">@error</MudText>
+            }
+        </MudExpansionPanel>
+    </MudExpansionPanels>
+</div>
+
+@code {
+    bool success;
+    string[] errors = { };
+    MudTextField<string> ipField1;
+    MudTextField<string> macField1;
+
+    MudForm form;
+
+    private IEnumerable<string> ValidateIp(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "IPv4 is required!";
+            yield break;
+        }
+        if (!Regex.IsMatch(pw, @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"))
+            yield return "IPv4 format is 000.000.000.000";
+    }
+    private IEnumerable<string> ValidateMac(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Mac is required!";
+            yield break;
+        }
+        if (!Regex.IsMatch(pw, @"^[0-9a-fA-F]{2}(((:[0-9a-fA-F]{2}){5})|((-[0-9a-fA-F]{2}){5}))$"))
+            yield return "MAC format is aa:aa:aa:aa:aa or aa-aa-aa-aa-aa-aa";
+    }
+}

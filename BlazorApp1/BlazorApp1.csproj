@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-BlazorApp1-D0A4D83A-880F-4E42-AE1E-B860510CF610</UserSecretsId>
   </PropertyGroup>
