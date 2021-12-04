@@ -1,2 +1,3 @@
 # ImageUploadMudBlazor
-Issue with file upload on MudBlazor 6
+File upload on MudBlazor 6
+Regex validation for MAC and IP
